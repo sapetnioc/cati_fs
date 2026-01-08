@@ -32,18 +32,22 @@ def main():
         try:
             time.sleep(1)
             os.mkdir(tmp + '/bidon')
-            open(tmp + '/bidon/a_file', 'w').write('something')
+            with open(tmp + '/bidon/a_file', 'w') as f:
+                f.write('something')
             if mount.poll() is None:
                 os.mkdir(mountpoint + '/test')
                 check_call([cati_fs, 'add', db, tmp + '/bidon', '/test/bidon'])            
                 check_call([cati_fs, 'add', db, tmp + '/bidon/a_file', '/test/bidon/a_file'])            
                 assert(tree(mountpoint) == expected)
                 assert(open(mountpoint +'/test/bidon/a_file').read() == 'something')
-                f = open(mountpoint + '/test/bidon/a_file', 'w')
-                f.write('something else')
-                del f
+                with open(mountpoint + '/test/bidon/a_file', 'w') as f:
+                    f.write('something else')
                 print(repr(open(mountpoint +'/test/bidon/a_file').read()))
-                assert(open(mountpoint +'/test/bidon/a_file').read() == 'something else')
+                try:
+                    assert(open(mountpoint +'/test/bidon/a_file').read() == 'something else')
+                except AssertionError:
+                    print(repr(open(mountpoint +'/test/bidon/a_file').read()))
+                    raise
             else:
                 print('ERROR: while mounting cati_fs', file=sys.stderr)
                 return 1
