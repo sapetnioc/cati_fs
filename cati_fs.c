@@ -53,7 +53,7 @@
 #endif
 #include <sys/file.h> /* flock(2) */
 
-#include "sqlite3.h"
+#include <sqlite3.h>
 
 
 static const char schema[] =
